@@ -1,7 +1,8 @@
 import * as vscode from 'vscode';
 import { DevicePreviewProvider } from './devicePreview';
 
-export function activate(context: vscode.ExtensionContext) {
+export async function activate(context: vscode.ExtensionContext) {
 	// Register our custom preview provider
-	context.subscriptions.push(DevicePreviewProvider.register(context));
+	var registration = await DevicePreviewProvider.register(context);
+	context.subscriptions.push(registration);
 }
