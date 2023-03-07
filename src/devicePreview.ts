@@ -60,6 +60,9 @@ export class DevicePreviewProvider {
 
         const registerAttributes = schema.Query.registerAttributes(deviceMetadata.registers, this.registerProperties);
         const registerTable = this.getHtmlTable(registerAttributes.keys, registerAttributes.values);
+
+        const bitMasks = Object.entries(deviceMetadata.bitMasks);
+        const bitMaskData = bitMasks?.map(([name, bitMask]: [string, any]) => this.getHtmlBitMaskDescription(name, bitMask));
         return `
         <!DOCTYPE html>
         <html>
@@ -68,6 +71,8 @@ export class DevicePreviewProvider {
             ${deviceTable}
             <h1>Registers</h1>
             ${registerTable}
+            <h1>Bit Masks</h1>
+            ${bitMaskData.join('\n')}
         </body>
         </html>`;
     }
@@ -85,5 +90,15 @@ export class DevicePreviewProvider {
                     ${data.reduce((content, attributes) => (content + tableData(attributes)), '')}
                 </table>
             </div>`;
+    }
+
+    private getHtmlBitMaskDescription(name: string, bitMask: any) {
+        const bitMaskAttributes = schema.Query.maskBitAttributes(bitMask.bits);
+        const bitMaskTable = this.getHtmlTable(bitMaskAttributes.keys, bitMaskAttributes.values);
+        return `
+            <h2>${name}</h2>
+            <p>${bitMask.description}</p>
+            ${bitMaskTable}
+        `;
     }
 }
