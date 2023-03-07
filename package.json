@@ -20,7 +20,16 @@
         "title": "Device Preview",
         "category": "Harp"
       }
-    ]
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "harp.device.sidePreview",
+          "when": "editorLangId == yaml",
+          "group": "navigation"
+        }
+      ]
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run package",
