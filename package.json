@@ -1,6 +1,6 @@
 {
-  "name": "harp-viewer",
-  "displayName": "Harp Viewer",
+  "name": "harp-tech.harp",
+  "displayName": "Harp",
   "description": "This extension provides a preview for Harp device metadata files.",
   "version": "0.0.1",
   "engines": {
