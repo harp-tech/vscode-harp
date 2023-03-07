@@ -61,31 +61,18 @@ export class DevicePreviewProvider {
     private getHtmlForDocument(document: vscode.TextDocument): string {
         const content = document.getText();
         const deviceMetadata = parse(content);
-        const deviceAttributes = schema.Query.deviceAttributes(deviceMetadata, this.deviceProperties);
-        const deviceTable = this.getHtmlTable(deviceAttributes.keys, deviceAttributes.values);
-
-        const registerAttributes = schema.Query.registerAttributes(deviceMetadata.registers, this.registerProperties);
-        const registerTable = this.getHtmlTable(registerAttributes.keys, registerAttributes.values);
-
-        const bitMasks = Object.entries(deviceMetadata.bitMasks);
-        const bitMaskData = bitMasks?.map(
-            ([name, bitMask]: [string, any]) => this.getHtmlMaskDescription(name, bitMask, 'bits'));
-
-        const groupMasks = Object.entries(deviceMetadata.groupMasks);
-        const groupMaskData = groupMasks?.map(
-            ([name, bitMask]: [string, any]) => this.getHtmlMaskDescription(name, bitMask, 'values'));
+        const htmlDevice = this.getHtmlDeviceDescription(deviceMetadata);
+        const htmlRegisters = this.getHtmlRegisterDescription(deviceMetadata.registers);
+        const htmlBitMasks = this.getHtmlMaskSection('Bit Masks', deviceMetadata.bitMasks, 'bits');
+        const htmlGroupMasks = this.getHtmlMaskSection('Group Masks', deviceMetadata.groupMasks, 'values');
         return `
         <!DOCTYPE html>
         <html>
         <body>
-            <h1>${deviceMetadata.device}</h1>
-            ${deviceTable}
-            <h1>Registers</h1>
-            ${registerTable}
-            <h1>Bit Masks</h1>
-            ${bitMaskData.join('\n')}
-            <h1>Group Masks</h1>
-            ${groupMaskData.join('\n')}
+            ${htmlDevice}
+            ${htmlRegisters}
+            ${htmlBitMasks}
+            ${htmlGroupMasks}
         </body>
         </html>`;
     }
@@ -103,6 +90,36 @@ export class DevicePreviewProvider {
                     ${data.reduce((content, attributes) => (content + tableData(attributes)), '')}
                 </table>
             </div>`;
+    }
+
+    private getHtmlDeviceDescription(deviceMetadata: any) {
+        const deviceAttributes = schema.Query.deviceAttributes(deviceMetadata, this.deviceProperties);
+        const deviceTable = this.getHtmlTable(deviceAttributes.keys, deviceAttributes.values);
+        return `
+            <h1>${deviceMetadata.device}</h1>
+            ${deviceTable}
+        `;
+    }
+
+    private getHtmlRegisterDescription(registers: any) {
+        if (registers === undefined) { return ''; }
+        const registerAttributes = schema.Query.registerAttributes(registers, this.registerProperties);
+        const registerTable = this.getHtmlTable(registerAttributes.keys, registerAttributes.values);
+        return `
+            <h1>Registers</h1>
+            ${registerTable}
+        `;
+    }
+
+    private getHtmlMaskSection(name: string, masks: any, key: string) {
+        if (masks === undefined) { return ''; }
+        const maskEntries = Object.entries(masks);
+        const maskDescriptions = maskEntries?.map(
+            ([name, mask]: [string, any]) => this.getHtmlMaskDescription(name, mask, key));
+        return `
+            <h1>${name}</h1>
+            ${maskDescriptions.join('\n')}
+        `;
     }
 
     private getHtmlMaskDescription(name: string, mask: any, key: string) {
