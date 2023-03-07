@@ -38,17 +38,16 @@ export class Query {
         return new QueryResult(registerKeys, registerData);
     }
 
-    private static readonly maskBitAttributeNames = ['name', 'value', 'description'];
+    private static readonly maskAttributeNames = ['name', 'value', 'description'];
 
     private static toHexString(value: any): string {
         return "0x" + (+(value)).toString(16);
     }
 
-    public static maskBitAttributes(bits: any) {
-        const entries = Object.entries(bits).map(([name, value]) => [name, ]);
+    public static maskAttributes(maskValues: any) {
         return new QueryResult(
-            Query.maskBitAttributeNames,
-            Object.entries(bits).map(([name, value]: [string, any]) => [name, ...typeof value !== 'object'
+            Query.maskAttributeNames,
+            Object.entries(maskValues).map(([name, value]: [string, any]) => [name, ...typeof value !== 'object'
                 ? [this.toHexString(value), '']
                 : Object.entries(value).map(
                     ([key, value], i) => i === 0 ? this.toHexString(key) : value)]));
