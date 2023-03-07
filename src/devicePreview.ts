@@ -27,6 +27,12 @@ export class DevicePreviewProvider {
     {
         this.deviceProperties = schema.Parser.deviceProperties(deviceSchema);
         this.registerProperties = schema.Parser.registerProperties(registerSchema);
+        context.subscriptions.push(vscode.workspace.onDidSaveTextDocument(document => {
+            const panel = this.activePanels.get(document.uri);
+            if (panel !== undefined) {
+                panel.webview.html = this.getHtmlForDocument(document);
+            }
+        }));
     }
 
     public async resolvePreviewPanel() {
